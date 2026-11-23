@@ -36,15 +36,15 @@ export default function Market() {
       <div className="filters">
         <div className="input-icon filters__search">
           <Search size={16} />
-          <input className="input" placeholder="Search by player name" value={name} onChange={(e) => reset(() => setName(e.target.value))} />
+          <input className="input" placeholder="Search by player name" data-testid="market-search" value={name} onChange={(e) => reset(() => setName(e.target.value))} />
         </div>
-        <select className="input input--select" value={rarity} onChange={(e) => reset(() => setRarity(e.target.value))} aria-label="Rarity">
+        <select className="input input--select" value={rarity} onChange={(e) => reset(() => setRarity(e.target.value))} aria-label="Rarity" data-testid="market-rarity">
           <option value="">All rarities</option>
           {RARITIES.map((r) => (
             <option key={r}>{r}</option>
           ))}
         </select>
-        <select className="input input--select" value={position} onChange={(e) => reset(() => setPosition(e.target.value))} aria-label="Position">
+        <select className="input input--select" value={position} onChange={(e) => reset(() => setPosition(e.target.value))} aria-label="Position" data-testid="market-position">
           <option value="">All positions</option>
           {POSITIONS.map((p) => (
             <option key={p}>{p}</option>
@@ -53,7 +53,7 @@ export default function Market() {
         <span className="muted small">Sorted by name</span>
       </div>
 
-      {denied && <div className="notice">Prices are not available publicly yet. The catalog is shown without them.</div>}
+      {denied && <div className="notice" data-testid="market-notice">Prices are not available publicly yet. The catalog is shown without them.</div>}
 
       {loading && !data ? (
         <Loading />
@@ -65,7 +65,7 @@ export default function Market() {
             <EmptyState title="No cards match your filters" text="Try a different name, rarity or position." />
           ) : (
             <div className="table-wrap">
-              <table className="table table--tall">
+              <table className="table table--tall" data-testid="market-table">
                 <thead>
                   <tr>
                     <th>Card</th>
@@ -80,7 +80,7 @@ export default function Market() {
                   {data.items.map((c) => {
                     const s = prices[c.id]?.stats
                     return (
-                      <tr key={c.id}>
+                      <tr key={c.id} data-testid="market-row" data-card-id={c.id} data-card-name={c.name}>
                         <td>
                           <div className="cell-card">
                             <RatingChip overall={c.overall} rarity={c.rarity} />
@@ -92,9 +92,9 @@ export default function Market() {
                         </td>
                         <td className="muted">{c.club}</td>
                         <td className="muted">{c.rarity}</td>
-                        <td className="num mono">{s ? num(s.last) : '—'}</td>
+                        <td className="num mono" data-testid="market-price">{s ? num(s.last) : '—'}</td>
                         <td className="num">
-                          <Delta value={s?.changePct ?? null} text={s?.changePct == null ? '' : pct(s.changePct)} />
+                          <Delta testId="market-change" value={s?.changePct ?? null} text={s?.changePct == null ? '' : pct(s.changePct)} />
                         </td>
                         <td>
                           <Sparkline values={s?.spark ?? []} />

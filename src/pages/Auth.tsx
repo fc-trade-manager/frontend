@@ -13,7 +13,7 @@ function AuthShell({ title, subtitle, children, footer }: { title: string; subti
         {children}
         <p className="auth__footer muted">{footer}</p>
       </div>
-      <Link to="/market" className="auth__market">
+      <Link to="/market" className="auth__market" data-testid="auth-market-link">
         Browse the public market
       </Link>
     </div>
@@ -52,19 +52,19 @@ export function Login() {
         </>
       }
     >
-      <form onSubmit={submit} className="form">
+      <form onSubmit={submit} className="form" data-testid="login-form">
         <Field label="Email">
-          <input className="input" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@email.com" />
+          <input className="input" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@email.com" data-testid="login-email" />
         </Field>
         <Field label="Password">
-          <input className="input" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Your password" />
+          <input className="input" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Your password" data-testid="login-password" />
         </Field>
         <label className="check">
-          <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} />
+          <input type="checkbox" data-testid="login-remember" checked={remember} onChange={(e) => setRemember(e.target.checked)} />
           Keep me signed in
         </label>
         <FormError message={error} />
-        <button className="btn btn--primary btn--block" disabled={busy}>
+        <button className="btn btn--primary btn--block" disabled={busy} data-testid="login-submit">
           {busy ? 'Signing in…' : 'Sign in'}
         </button>
       </form>
@@ -105,21 +105,21 @@ export function Register() {
         </>
       }
     >
-      <form onSubmit={submit} className="form">
+      <form onSubmit={submit} className="form" data-testid="register-form">
         <Field label="Display name">
-          <input className="input" required value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="Your name" />
+          <input className="input" required value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="Your name" data-testid="register-display-name" />
         </Field>
         <Field label="Username">
-          <input className="input" required autoComplete="username" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="trader123" />
+          <input className="input" required autoComplete="username" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="trader123" data-testid="register-username" />
         </Field>
         <Field label="Email">
-          <input className="input" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@email.com" />
+          <input className="input" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@email.com" data-testid="register-email" />
         </Field>
         <Field label="Password" hint="At least 8 characters.">
-          <input className="input" type="password" autoComplete="new-password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Create a password" />
+          <input className="input" type="password" autoComplete="new-password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Create a password" data-testid="register-password" />
         </Field>
         <FormError message={error} />
-        <button className="btn btn--primary btn--block" disabled={busy}>
+        <button className="btn btn--primary btn--block" disabled={busy} data-testid="register-submit">
           {busy ? 'Creating account…' : 'Create account'}
         </button>
       </form>

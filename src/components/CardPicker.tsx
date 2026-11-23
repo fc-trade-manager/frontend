@@ -37,14 +37,14 @@ export default function CardPicker({ value, onChange, disabled }: Props) {
 
   if (value) {
     return (
-      <div className="picked">
+      <div className="picked" data-testid="card-picker-selected">
         <RatingChip overall={value.overall} rarity={value.rarity} />
         <span className="picked__name">{value.name}</span>
         <span className="muted">
           {value.position} · {value.club}
         </span>
         {!disabled && (
-          <button type="button" className="icon-btn" aria-label="Choose another card" onClick={() => onChange(null)}>
+          <button type="button" className="icon-btn" aria-label="Choose another card" data-testid="card-picker-clear" onClick={() => onChange(null)}>
             <X size={16} />
           </button>
         )}
@@ -59,6 +59,7 @@ export default function CardPicker({ value, onChange, disabled }: Props) {
         <input
           className="input"
           placeholder="Search a card by name"
+          data-testid="card-picker-input"
           value={text}
           onChange={(e) => setText(e.target.value)}
           onFocus={() => setOpen(true)}
@@ -67,14 +68,16 @@ export default function CardPicker({ value, onChange, disabled }: Props) {
         />
       </div>
       {open && (
-        <ul className="picker__list card">
-          {failed && <li className="picker__empty">Could not load cards.</li>}
-          {!failed && !results.length && <li className="picker__empty">No cards found.</li>}
+        <ul className="picker__list card" data-testid="card-picker-list">
+          {failed && <li className="picker__empty" data-testid="card-picker-error">Could not load cards.</li>}
+          {!failed && !results.length && <li className="picker__empty" data-testid="card-picker-empty">No cards found.</li>}
           {results.map((c) => (
             <li key={c.id}>
               <button
                 type="button"
                 className="picker__item"
+                data-testid="card-picker-option"
+                data-card-name={c.name}
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => {
                   onChange(c)

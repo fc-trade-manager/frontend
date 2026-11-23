@@ -28,13 +28,13 @@ export function RatingChip({ overall, rarity }: { overall: number; rarity: strin
 }
 
 export function SideBadge({ side }: { side: Side }) {
-  return <span className={`badge badge--${side}`}>{side === 'buy' ? 'Buy' : 'Sell'}</span>
+  return <span className={`badge badge--${side}`} data-testid="side-badge" data-side={side}>{side === 'buy' ? 'Buy' : 'Sell'}</span>
 }
 
-export function Delta({ value, text }: { value: number | null; text: string }) {
-  if (value === null) return <span className="muted">—</span>
+export function Delta({ value, text, testId }: { value: number | null; text: string; testId?: string }) {
+  if (value === null) return <span className="muted" data-testid={testId}>—</span>
   const tone = value > 0 ? 'up' : value < 0 ? 'down' : 'flat'
-  return <span className={`delta delta--${tone} mono`}>{text}</span>
+  return <span className={`delta delta--${tone} mono`} data-testid={testId}>{text}</span>
 }
 
 export function Sparkline({ values, width = 96, height = 32 }: { values: number[]; width?: number; height?: number }) {
@@ -53,11 +53,11 @@ export function Sparkline({ values, width = 96, height = 32 }: { values: number[
   )
 }
 
-export function MetricCard({ label, value, sub, tone }: { label: string; value: ReactNode; sub?: ReactNode; tone?: 'up' | 'down' }) {
+export function MetricCard({ label, value, sub, tone, testId }: { label: string; value: ReactNode; sub?: ReactNode; tone?: 'up' | 'down'; testId?: string }) {
   return (
-    <div className="card metric">
+    <div className="card metric" data-testid={testId}>
       <span className="metric__label">{label}</span>
-      <span className={`metric__value mono${tone ? ` metric__value--${tone}` : ''}`}>{value}</span>
+      <span className={`metric__value mono${tone ? ` metric__value--${tone}` : ''}`} data-testid={testId ? `${testId}-value` : undefined}>{value}</span>
       {sub && <span className="metric__sub">{sub}</span>}
     </div>
   )
@@ -76,15 +76,15 @@ export function PageHeader({ title, subtitle, actions }: { title: string; subtit
 }
 
 export function Loading({ label = 'Loading…' }: { label?: string }) {
-  return <div className="state state--loading">{label}</div>
+  return <div className="state state--loading" data-testid="loading">{label}</div>
 }
 
 export function ErrorState({ message, onRetry }: { message: string; onRetry?: () => void }) {
   return (
-    <div className="state state--error" role="alert">
+    <div className="state state--error" role="alert" data-testid="error-state">
       <p>{message}</p>
       {onRetry && (
-        <button type="button" className="btn btn--ghost btn--sm" onClick={onRetry}>
+        <button type="button" className="btn btn--ghost btn--sm" onClick={onRetry} data-testid="error-retry">
           Try again
         </button>
       )}
@@ -94,7 +94,7 @@ export function ErrorState({ message, onRetry }: { message: string; onRetry?: ()
 
 export function EmptyState({ title, text, action }: { title: string; text?: string; action?: ReactNode }) {
   return (
-    <div className="state">
+    <div className="state" data-testid="empty-state">
       <strong>{title}</strong>
       {text && <p className="muted">{text}</p>}
       {action}
@@ -109,14 +109,14 @@ export function Field({ label, error, hint, children }: { label: string; error?:
     <label className="field">
       <span className="field__label">{label}</span>
       {children}
-      {error ? <span className="field__error">{error}</span> : hint ? <span className="field__hint">{hint}</span> : null}
+      {error ? <span className="field__error" data-testid="field-error">{error}</span> : hint ? <span className="field__hint">{hint}</span> : null}
     </label>
   )
 }
 
 export function FormError({ message }: { message: string | null }) {
   return message ? (
-    <div className="form-error" role="alert">
+    <div className="form-error" role="alert" data-testid="form-error">
       {message}
     </div>
   ) : null
@@ -133,10 +133,10 @@ export function Modal({ title, onClose, children }: { title: string; onClose: ()
 
   return (
     <div className="modal-backdrop" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal card" role="dialog" aria-modal="true" aria-label={title}>
+      <div className="modal card" role="dialog" aria-modal="true" aria-label={title} data-testid="modal">
         <div className="modal__head">
           <h2>{title}</h2>
-          <button type="button" className="icon-btn" onClick={onClose} aria-label="Close">
+          <button type="button" className="icon-btn" onClick={onClose} aria-label="Close" data-testid="modal-close">
             <X size={18} />
           </button>
         </div>
@@ -151,14 +151,14 @@ export function Modal({ title, onClose, children }: { title: string; onClose: ()
 export function Pagination({ page, totalPages, onPage }: { page: number; totalPages: number; onPage: (p: number) => void }) {
   if (totalPages <= 1) return null
   return (
-    <div className="pagination">
-      <button type="button" className="btn btn--ghost btn--sm" disabled={page <= 1} onClick={() => onPage(page - 1)}>
+    <div className="pagination" data-testid="pagination">
+      <button type="button" className="btn btn--ghost btn--sm" disabled={page <= 1} data-testid="pagination-prev" onClick={() => onPage(page - 1)}>
         Previous
       </button>
-      <span className="muted">
+      <span className="muted" data-testid="pagination-info">
         Page {page} of {totalPages}
       </span>
-      <button type="button" className="btn btn--ghost btn--sm" disabled={page >= totalPages} onClick={() => onPage(page + 1)}>
+      <button type="button" className="btn btn--ghost btn--sm" disabled={page >= totalPages} data-testid="pagination-next" onClick={() => onPage(page + 1)}>
         Next
       </button>
     </div>
