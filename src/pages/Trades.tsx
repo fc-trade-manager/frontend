@@ -50,12 +50,12 @@ function TradeForm({ trade, onDone, onCancel }: { trade?: Trade; onDone: () => v
   const [today] = useState(() => dateText(new Date()))
   const total = Number(price) * Number(qty)
   return (
-    <form className="form" onSubmit={submit}>
+    <form className="form" onSubmit={submit} data-testid="trade-form">
       <div className="segmented" role="group" aria-label="Trade type">
-        <button type="button" className={side === 'buy' ? 'is-active' : ''} onClick={() => setSide('buy')}>
+        <button type="button" className={side === 'buy' ? 'is-active' : ''} onClick={() => setSide('buy')} data-testid="trade-side-buy">
           Buy
         </button>
-        <button type="button" className={side === 'sell' ? 'is-active' : ''} onClick={() => setSide('sell')}>
+        <button type="button" className={side === 'sell' ? 'is-active' : ''} onClick={() => setSide('sell')} data-testid="trade-side-sell">
           Sell
         </button>
       </div>
@@ -64,28 +64,28 @@ function TradeForm({ trade, onDone, onCancel }: { trade?: Trade; onDone: () => v
       </Field>
       <div className="form__row">
         <Field label="Price (per card)">
-          <input className="input mono" type="number" min={200} max={15000000} step={50} value={price} onChange={(e) => setPrice(e.target.value)} placeholder="e.g. 48,000" />
+          <input className="input mono" type="number" min={200} max={15000000} step={50} value={price} onChange={(e) => setPrice(e.target.value)} placeholder="e.g. 48,000" data-testid="trade-price-input" />
         </Field>
         <Field label="Quantity">
-          <input className="input mono" type="number" min={1} max={100} step={1} value={qty} onChange={(e) => setQty(e.target.value)} />
+          <input className="input mono" type="number" min={1} max={100} step={1} value={qty} onChange={(e) => setQty(e.target.value)} data-testid="trade-quantity-input" />
         </Field>
       </div>
       <Field label="Date" hint="Trades are recorded with the current date and time.">
         <input className="input" value={today} disabled readOnly />
       </Field>
       {total > 0 && Number.isFinite(total) && (
-        <p className="muted small">
+        <p className="muted small" data-testid="trade-total">
           {side === 'buy' ? 'Total cost' : 'After the 5% fee you receive'}: <span className="mono strong">{num(side === 'buy' ? total : total * NET_RATE)}</span>
         </p>
       )}
       <FormError message={error} />
       <div className="form__actions">
         {onCancel && (
-          <button type="button" className="btn btn--ghost" onClick={onCancel}>
+          <button type="button" className="btn btn--ghost" onClick={onCancel} data-testid="trade-cancel">
             Cancel
           </button>
         )}
-        <button className="btn btn--primary" disabled={busy}>
+        <button className="btn btn--primary" disabled={busy} data-testid="trade-submit">
           {busy ? 'Saving…' : trade ? 'Save changes' : `Register ${side}`}
         </button>
       </div>
@@ -122,10 +122,10 @@ export default function Trades() {
 
   const rowActions = (t: Trade) => (
     <td className="actions">
-      <button className="icon-btn" aria-label="Edit trade" onClick={() => setEditing(t)}>
+      <button className="icon-btn" aria-label="Edit trade" data-testid="trade-edit" onClick={() => setEditing(t)}>
         <Pencil size={16} />
       </button>
-      <button className="icon-btn icon-btn--danger" aria-label="Delete trade" onClick={() => remove(t)}>
+      <button className="icon-btn icon-btn--danger" aria-label="Delete trade" data-testid="trade-delete" onClick={() => remove(t)}>
         <Trash2 size={16} />
       </button>
     </td>
@@ -137,7 +137,7 @@ export default function Trades() {
         title="Trades"
         subtitle="Every buy and sale, with profit after the 5% fee."
         actions={
-          <button className="btn btn--primary" onClick={() => setShowForm((s) => !s)}>
+          <button className="btn btn--primary" onClick={() => setShowForm((s) => !s)} data-testid="trades-new-button">
             <Plus size={16} /> New trade
           </button>
         }
@@ -165,7 +165,7 @@ export default function Trades() {
             ['all', 'All trades'],
           ] as const
         ).map(([id, label]) => (
-          <button key={id} role="tab" aria-selected={tab === id} className={tab === id ? 'is-active' : ''} onClick={() => setTab(id)}>
+          <button key={id} data-testid={`trades-tab-${id}`} role="tab" aria-selected={tab === id} className={tab === id ? 'is-active' : ''} onClick={() => setTab(id)}>
             {label}
           </button>
         ))}
@@ -193,7 +193,7 @@ export default function Trades() {
                 </thead>
                 <tbody>
                   {rows.map(({ trade: t, buyAvg, fee, returnPct }) => (
-                    <tr key={t.id}>
+                    <tr key={t.id} data-testid="trade-row" data-trade-id={t.id} data-card-name={t.cardName} data-trade-type={t.type}>
                       <td className="muted">{fmtDate(t.executedAt)}</td>
                       <td className="strong">{t.cardName}</td>
                       <td className="num mono">{t.quantity}</td>
@@ -201,10 +201,10 @@ export default function Trades() {
                       <td className="num mono">{num(t.price)}</td>
                       <td className="num mono">{num(fee)}</td>
                       <td className="num">
-                        <Delta value={t.calculatedProfit} text={signed(t.calculatedProfit)} />
+                        <Delta testId="trade-profit" value={t.calculatedProfit} text={signed(t.calculatedProfit)} />
                       </td>
                       <td className="num">
-                        <Delta value={returnPct} text={pct(returnPct)} />
+                        <Delta testId="trade-return" value={returnPct} text={pct(returnPct)} />
                       </td>
                       {rowActions(t)}
                     </tr>
@@ -238,15 +238,15 @@ export default function Trades() {
                     const after = market === null ? null : market * NET_RATE
                     const potential = after === null ? null : after - p.avgCost * p.quantity
                     return (
-                      <tr key={p.cardId}>
+                      <tr key={p.cardId} data-testid="position-row" data-card-name={p.cardName}>
                         <td className="strong">{p.cardName}</td>
-                        <td className="num mono">{p.quantity}</td>
-                        <td className="num mono">{num(p.avgCost)}</td>
+                        <td className="num mono" data-testid="position-qty">{p.quantity}</td>
+                        <td className="num mono" data-testid="position-avg-buy">{num(p.avgCost)}</td>
                         <td className="num mono">{last === null ? '—' : num(last)}</td>
                         <td className="num mono">{market === null ? '—' : num(market)}</td>
                         <td className="num mono">{after === null ? '—' : num(after)}</td>
                         <td className="num">
-                          <Delta value={potential} text={potential === null ? '' : signed(potential)} />
+                          <Delta testId="position-potential" value={potential} text={potential === null ? '' : signed(potential)} />
                         </td>
                       </tr>
                     )
@@ -275,7 +275,7 @@ export default function Trades() {
                 </thead>
                 <tbody>
                   {all.map((t) => (
-                    <tr key={t.id}>
+                    <tr key={t.id} data-testid="trade-row" data-trade-id={t.id} data-card-name={t.cardName} data-trade-type={t.type}>
                       <td className="muted">{fmtDate(t.executedAt)}</td>
                       <td className="strong">{t.cardName}</td>
                       <td>
@@ -283,7 +283,7 @@ export default function Trades() {
                       </td>
                       <td className="num mono">{t.quantity}</td>
                       <td className="num mono">{num(t.price)}</td>
-                      <td className="num">{t.type === 'sell' ? <Delta value={t.calculatedProfit} text={signed(t.calculatedProfit)} /> : <span className="muted">—</span>}</td>
+                      <td className="num">{t.type === 'sell' ? <Delta testId="trade-profit" value={t.calculatedProfit} text={signed(t.calculatedProfit)} /> : <span className="muted">—</span>}</td>
                       {rowActions(t)}
                     </tr>
                   ))}

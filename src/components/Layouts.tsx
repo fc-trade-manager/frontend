@@ -18,7 +18,7 @@ const NAV = [
 function ThemeToggle() {
   const { theme, toggle } = useTheme()
   return (
-    <button type="button" className="icon-btn" onClick={toggle} aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}>
+    <button type="button" className="icon-btn" onClick={toggle} data-testid="theme-toggle" aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}>
       {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
     </button>
   )
@@ -50,13 +50,13 @@ function AccountMenu() {
   console.log("Dados do usuário na sessão:", session.user);
   return (
     <div className="account" ref={ref}>
-      <button type="button" className="account__btn" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
+      <button type="button" className="account__btn" data-testid="account-menu-button" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
         <span className="avatar">{name.slice(0, 1).toUpperCase()}</span>
-        <span className="account__name">{name}</span>
+        <span className="account__name" data-testid="account-name">{name}</span>
         <ChevronDown size={16} />
       </button>
       {open && (
-        <div className="account__menu card">
+        <div className="account__menu card" data-testid="account-menu">
           <div className="account__who">
             <strong>{name}</strong>
             <span className="muted">{session.user.email}</span>
@@ -64,6 +64,7 @@ function AccountMenu() {
           <button
             type="button"
             className="account__item"
+            data-testid="logout-button"
             onClick={async () => {
               await logout()
               navigate('/login')
@@ -87,7 +88,7 @@ export function AppLayout() {
         </div>
         <nav className="sidebar__nav">
           {NAV.map(({ to, label, icon: Icon, end }) => (
-            <NavLink key={to} to={to} end={end} className={({ isActive }) => `nav-link${isActive ? ' is-active' : ''}`}>
+            <NavLink key={to} to={to} end={end} data-testid={`nav-${label.toLowerCase()}`} className={({ isActive }) => `nav-link${isActive ? ' is-active' : ''}`}>
               <Icon size={18} />
               {label}
             </NavLink>
@@ -99,9 +100,9 @@ export function AppLayout() {
           <Clock />
           <div className="topbar__right">
             <ThemeToggle />
-            <Link to="/alerts" className="icon-btn bell" aria-label={`Alerts${unread ? `, ${unread} unread` : ''}`}>
+            <Link to="/alerts" data-testid="alerts-bell" className="icon-btn bell" aria-label={`Alerts${unread ? `, ${unread} unread` : ''}`}>
               <Bell size={18} />
-              {unread > 0 && <span className="bell__badge">{unread > 9 ? '9+' : unread}</span>}
+              {unread > 0 && <span className="bell__badge" data-testid="alerts-unread-badge">{unread > 9 ? '9+' : unread}</span>}
             </Link>
             <AccountMenu />
           </div>
@@ -123,10 +124,10 @@ export function PublicLayout() {
         </Link>
         <div className="topbar__right">
           <ThemeToggle />
-          <Link to="/login" className="btn btn--ghost">
+          <Link to="/login" className="btn btn--ghost" data-testid="public-signin-link">
             Sign in
           </Link>
-          <Link to="/register" className="btn btn--primary">
+          <Link to="/register" className="btn btn--primary" data-testid="public-register-link">
             Create account
           </Link>
         </div>

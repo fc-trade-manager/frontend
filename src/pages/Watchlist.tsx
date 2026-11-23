@@ -37,7 +37,7 @@ function TargetsModal({ item, onClose, onSaved }: { item: WatchlistItem | null; 
 
   return (
     <Modal title={item ? `Edit targets · ${item.cardName}` : 'Add card to watchlist'} onClose={onClose}>
-      <form className="form" onSubmit={submit}>
+      <form className="form" onSubmit={submit} data-testid="targets-form">
         {!item && (
           <Field label="Card">
             <CardPicker value={card} onChange={setCard} />
@@ -45,18 +45,18 @@ function TargetsModal({ item, onClose, onSaved }: { item: WatchlistItem | null; 
         )}
         <div className="form__row">
           <Field label="Buy target">
-            <input className="input mono" type="number" min={200} max={15000000} step={50} value={buy} onChange={(e) => setBuy(e.target.value)} placeholder="e.g. 80,000" />
+            <input className="input mono" type="number" min={200} max={15000000} step={50} value={buy} onChange={(e) => setBuy(e.target.value)} placeholder="e.g. 80,000" data-testid="targets-buy-input" />
           </Field>
           <Field label="Sell target">
-            <input className="input mono" type="number" min={200} max={15000000} step={50} value={sell} onChange={(e) => setSell(e.target.value)} placeholder="e.g. 100,000" />
+            <input className="input mono" type="number" min={200} max={15000000} step={50} value={sell} onChange={(e) => setSell(e.target.value)} placeholder="e.g. 100,000" data-testid="targets-sell-input" />
           </Field>
         </div>
         <FormError message={error} />
         <div className="form__actions">
-          <button type="button" className="btn btn--ghost" onClick={onClose}>
+          <button type="button" className="btn btn--ghost" onClick={onClose} data-testid="targets-cancel">
             Cancel
           </button>
-          <button className="btn btn--primary" disabled={busy}>
+          <button className="btn btn--primary" disabled={busy} data-testid="targets-submit">
             {busy ? 'Saving…' : 'Save'}
           </button>
         </div>
@@ -100,12 +100,12 @@ export default function Watchlist() {
         subtitle="Cards you are tracking, with your buy and sell targets."
         actions={
           <>
-            <select className="input input--select" value={sortBy} onChange={(e) => setSortBy(e.target.value as SortBy)} aria-label="Sort by">
+            <select className="input input--select" value={sortBy} onChange={(e) => setSortBy(e.target.value as SortBy)} aria-label="Sort by" data-testid="watchlist-sort">
               <option value="name">Sort by name</option>
               <option value="price">Sort by price</option>
               <option value="change">Sort by 24h change</option>
             </select>
-            <button className="btn btn--primary" onClick={() => setEditing('new')}>
+            <button className="btn btn--primary" onClick={() => setEditing('new')} data-testid="watchlist-add-button">
               <Plus size={16} /> Add card
             </button>
           </>
@@ -118,7 +118,7 @@ export default function Watchlist() {
           <EmptyState title="Your watchlist is empty" text="Add a card with a buy and a sell target. You will get an alert when the price reaches one of them." />
         ) : (
           <div className="table-wrap">
-            <table className="table table--tall">
+            <table className="table table--tall" data-testid="watchlist-table">
               <thead>
                 <tr>
                   <th>Card</th>
@@ -137,7 +137,7 @@ export default function Watchlist() {
                   const toBuy = i.lastPrice && i.lastPrice > 0 ? ((i.targetBuyPrice - i.lastPrice) / i.lastPrice) * 100 : null
                   const toSell = i.lastPrice && i.lastPrice > 0 ? ((i.targetSellPrice - i.lastPrice) / i.lastPrice) * 100 : null
                   return (
-                    <tr key={i.id}>
+                    <tr key={i.id} data-testid="watchlist-row" data-card-id={i.cardId} data-card-name={i.cardName}>
                       <td>
                         <div className="cell-card">
                           <RatingChip overall={i.overall} rarity={i.rarity} />
@@ -149,22 +149,22 @@ export default function Watchlist() {
                           </div>
                         </div>
                       </td>
-                      <td className="num mono">{i.lastPrice === null ? '—' : num(i.lastPrice)}</td>
+                      <td className="num mono" data-testid="watchlist-last-price">{i.lastPrice === null ? '—' : num(i.lastPrice)}</td>
                       <td className="num">
-                        <Delta value={i.priceChangePercent24h} text={i.priceChangePercent24h === null ? '' : pct(i.priceChangePercent24h)} />
+                        <Delta testId="watchlist-change-24h" value={i.priceChangePercent24h} text={i.priceChangePercent24h === null ? '' : pct(i.priceChangePercent24h)} />
                       </td>
                       <td>
                         <Sparkline values={prices[i.cardId]?.stats?.spark ?? []} />
                       </td>
-                      <td className="num mono">{num(i.targetBuyPrice)}</td>
-                      <td className="num mono">{toBuy === null ? '—' : pct(toBuy)}</td>
-                      <td className="num mono">{num(i.targetSellPrice)}</td>
-                      <td className="num mono">{toSell === null ? '—' : pct(toSell)}</td>
+                      <td className="num mono" data-testid="watchlist-buy-target">{num(i.targetBuyPrice)}</td>
+                      <td className="num mono" data-testid="watchlist-to-buy">{toBuy === null ? '—' : pct(toBuy)}</td>
+                      <td className="num mono" data-testid="watchlist-sell-target">{num(i.targetSellPrice)}</td>
+                      <td className="num mono" data-testid="watchlist-to-sell">{toSell === null ? '—' : pct(toSell)}</td>
                       <td className="actions">
-                        <button className="icon-btn" aria-label={`Edit targets for ${i.cardName}`} onClick={() => setEditing(i)}>
+                        <button className="icon-btn" aria-label={`Edit targets for ${i.cardName}`} data-testid="watchlist-edit" onClick={() => setEditing(i)}>
                           <Pencil size={16} />
                         </button>
-                        <button className="icon-btn icon-btn--danger" aria-label={`Remove ${i.cardName}`} onClick={() => remove(i)}>
+                        <button className="icon-btn icon-btn--danger" aria-label={`Remove ${i.cardName}`} data-testid="watchlist-remove" onClick={() => remove(i)}>
                           <Trash2 size={16} />
                         </button>
                       </td>

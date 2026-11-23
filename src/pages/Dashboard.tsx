@@ -30,10 +30,10 @@ export default function Dashboard() {
       <PageHeader title="Dashboard" subtitle="Your profit and open positions at a glance." />
 
       <section className="grid grid--4">
-        <MetricCard label="Total profit" value={signed(dashboard.totalProfit)} tone={totalTone} sub={sells.length ? `${wins} of ${sells.length} ${sells.length === 1 ? "sale" : "sales"} in profit` : 'No sales yet'} />
-        <MetricCard label="Best trade" value={dashboard.bestTradeProfit === null ? '—' : signed(dashboard.bestTradeProfit)} tone={dashboard.bestTradeProfit && dashboard.bestTradeProfit > 0 ? 'up' : undefined} />
-        <MetricCard label="Worst trade" value={dashboard.worstTradeProfit === null ? '—' : signed(dashboard.worstTradeProfit)} tone={dashboard.worstTradeProfit && dashboard.worstTradeProfit < 0 ? 'down' : undefined} />
-        <MetricCard label="Open positions" value={dashboard.openPositionsCount} sub={invested > 0 ? `${num(invested)} invested` : 'Nothing invested'} />
+        <MetricCard testId="metric-total-profit" label="Total profit" value={signed(dashboard.totalProfit)} tone={totalTone} sub={sells.length ? `${wins} of ${sells.length} ${sells.length === 1 ? "sale" : "sales"} in profit` : 'No sales yet'} />
+        <MetricCard testId="metric-best-trade" label="Best trade" value={dashboard.bestTradeProfit === null ? '—' : signed(dashboard.bestTradeProfit)} tone={dashboard.bestTradeProfit && dashboard.bestTradeProfit > 0 ? 'up' : undefined} />
+        <MetricCard testId="metric-worst-trade" label="Worst trade" value={dashboard.worstTradeProfit === null ? '—' : signed(dashboard.worstTradeProfit)} tone={dashboard.worstTradeProfit && dashboard.worstTradeProfit < 0 ? 'down' : undefined} />
+        <MetricCard testId="metric-open-positions" label="Open positions" value={dashboard.openPositionsCount} sub={invested > 0 ? `${num(invested)} invested` : 'Nothing invested'} />
       </section>
 
       <section className="card panel">
@@ -41,11 +41,13 @@ export default function Dashboard() {
           <h2>Cumulative profit</h2>
           <span className="muted">Realized, after the 5% sale fee</span>
         </div>
-        <ProfitChart points={cumulativeProfit(trades)} />
+        <div data-testid="profit-chart">
+          <ProfitChart points={cumulativeProfit(trades)} />
+        </div>
       </section>
 
       <section className="grid grid--2">
-        <div className="card panel">
+        <div className="card panel" data-testid="dashboard-open-positions">
           <div className="panel__head">
             <h2>Open positions</h2>
             <Link to="/trades">See all</Link>
@@ -68,12 +70,12 @@ export default function Dashboard() {
                     const last = prices[p.cardId]?.stats?.last
                     const potential = last === undefined ? null : last * NET_RATE * p.quantity - p.avgCost * p.quantity
                     return (
-                      <tr key={p.cardId}>
+                      <tr key={p.cardId} data-testid="dashboard-position-row" data-card-name={p.cardName}>
                         <td className="strong">{p.cardName}</td>
                         <td className="num mono">{p.quantity}</td>
                         <td className="num mono">{num(p.avgCost)}</td>
                         <td className="num">
-                          <Delta value={potential} text={potential === null ? '' : signed(potential)} />
+                          <Delta testId="dashboard-position-potential" value={potential} text={potential === null ? '' : signed(potential)} />
                         </td>
                       </tr>
                     )
@@ -84,7 +86,7 @@ export default function Dashboard() {
           )}
         </div>
 
-        <div className="card panel">
+        <div className="card panel" data-testid="dashboard-recent-trades">
           <div className="panel__head">
             <h2>Recent trades</h2>
             <Link to="/trades">See all</Link>
@@ -104,13 +106,13 @@ export default function Dashboard() {
                 </thead>
                 <tbody>
                   {recent.map((t) => (
-                    <tr key={t.id}>
+                    <tr key={t.id} data-testid="dashboard-trade-row" data-card-name={t.cardName} data-trade-type={t.type}>
                       <td className="muted">{fmtDate(t.executedAt)}</td>
                       <td className="strong">{t.cardName}</td>
                       <td>
                         <SideBadge side={t.type} />
                       </td>
-                      <td className="num">{t.type === 'sell' ? <Delta value={t.calculatedProfit} text={signed(t.calculatedProfit)} /> : <span className="muted">—</span>}</td>
+                      <td className="num">{t.type === 'sell' ? <Delta testId="dashboard-trade-profit" value={t.calculatedProfit} text={signed(t.calculatedProfit)} /> : <span className="muted">—</span>}</td>
                     </tr>
                   ))}
                 </tbody>

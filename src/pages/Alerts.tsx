@@ -34,7 +34,7 @@ export default function Alerts() {
         title="Alerts"
         subtitle="Triggered when a watchlist card reaches your buy or sell target."
         actions={
-          <button className="btn btn--ghost" disabled={!unread.length} onClick={() => markRead(unread.map((a) => a.id))}>
+          <button className="btn btn--ghost" disabled={!unread.length} data-testid="alerts-mark-all-read" onClick={() => markRead(unread.map((a) => a.id))}>
             Mark all as read
           </button>
         }
@@ -42,10 +42,10 @@ export default function Alerts() {
       <FormError message={actionError} />
 
       <div className="tabs" role="tablist">
-        <button role="tab" aria-selected={filter === 'all'} className={filter === 'all' ? 'is-active' : ''} onClick={() => setFilter('all')}>
+        <button role="tab" aria-selected={filter === 'all'} className={filter === 'all' ? 'is-active' : ''} onClick={() => setFilter('all')} data-testid="alerts-tab-all">
           All ({data.length})
         </button>
-        <button role="tab" aria-selected={filter === 'unread'} className={filter === 'unread' ? 'is-active' : ''} onClick={() => setFilter('unread')}>
+        <button role="tab" aria-selected={filter === 'unread'} className={filter === 'unread' ? 'is-active' : ''} onClick={() => setFilter('unread')} data-testid="alerts-tab-unread">
           Unread ({unread.length})
         </button>
       </div>
@@ -57,21 +57,21 @@ export default function Alerts() {
             text="Set buy and sell targets on your watchlist and alerts will show up here."
           />
         ) : (
-          <ul className="feed">
+          <ul className="feed" data-testid="alerts-feed">
             {list.map((a) => (
-              <li key={a.id} className={`feed__item${a.readAt ? '' : ' is-unread'}`}>
+              <li key={a.id} data-testid="alert-item" data-alert-kind={a.kind} data-card-name={a.cardName} data-read={a.readAt ? 'true' : 'false'} className={`feed__item${a.readAt ? '' : ' is-unread'}`}>
                 <span className={`feed__icon feed__icon--${a.kind}`}>{a.kind === 'buy' ? <ArrowDownToLine size={18} /> : <ArrowUpFromLine size={18} />}</span>
                 <div className="feed__body">
-                  <strong>{a.kind === 'buy' ? 'Buy target reached' : 'Sell target reached'}</strong>
+                  <strong data-testid="alert-title">{a.kind === 'buy' ? 'Buy target reached' : 'Sell target reached'}</strong>
                   <span>
-                    {a.cardName} hit <span className="mono strong">{num(a.triggeredPrice)}</span>
+                    {a.cardName} hit <span className="mono strong" data-testid="alert-price">{num(a.triggeredPrice)}</span>
                   </span>
                   <span className="muted small" title={fmtDateTime(a.createdAt)}>
                     {relative(a.createdAt)}
                   </span>
                 </div>
                 {!a.readAt && (
-                  <button className="btn btn--ghost btn--sm" onClick={() => markRead([a.id])}>
+                  <button className="btn btn--ghost btn--sm" onClick={() => markRead([a.id])} data-testid="alert-mark-read">
                     Mark as read
                   </button>
                 )}
