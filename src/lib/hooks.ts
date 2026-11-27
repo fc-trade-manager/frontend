@@ -58,6 +58,10 @@ export function loadPrice(cardId: string): Promise<PriceResult> {
     .then((points): PriceResult => ({ stats: priceStats(points) }))
     .catch((e: unknown): PriceResult => ({ stats: null, failed: e instanceof ApiError ? e.status : 0 }))
   priceCache.set(cardId, { at: Date.now(), value })
+  // failures (401, network error...) must not stay cached: the next call should try again
+  void value.then((r) => {
+    if (r.failed !== undefined && priceCache.get(cardId)?.value === value) priceCache.delete(cardId)
+  })
   return value
 }
 
@@ -140,7 +144,7 @@ export function useUnreadAlerts(): number {
         .then((list) => {
           if (!cancelled) setCount(list.filter((a) => !a.readAt).length)
         })
-        .catch(() => {})
+        .catch(() => { })
     }
     refresh()
     const id = setInterval(refresh, 60_000)
