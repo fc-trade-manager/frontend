@@ -9,6 +9,7 @@ import {
   sessionFromAuth,
 } from './session'
 import type { RegisterInput, Session } from './types'
+import { invalidatePrices } from './hooks'
 
 interface AuthValue {
   session: Session | null
@@ -23,7 +24,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(() => loadSession())
 
   useEffect(() => {
-    const sync = () => setSession(loadSession())
+    const sync = () => {
+      invalidatePrices()
+      setSession(loadSession())
+    }
     window.addEventListener(SESSION_EVENT, sync)
     return () => window.removeEventListener(SESSION_EVENT, sync)
   }, [])
@@ -44,7 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const current = loadSession()
     clearSession()
     notifySession()
-    if (current) await api.logout(current.refreshToken).catch(() => {})
+    if (current) await api.logout(current.refreshToken).catch(() => { })
   }, [])
 
   const value = useMemo(() => ({ session, login, register, logout }), [session, login, register, logout])
